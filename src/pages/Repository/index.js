@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import api from '../../services/api';
 import PropTypes from 'prop-types';
-// import { Container } from './styles';
+import { Link } from 'react-router-dom';
+
+import api from '../../services/api';
+import Container from '../../components/Container/index';
+import { Loading, Owner, IssueList } from './styles';
 
 export default class Repository extends Component {
-  static PropTypes = {
+  static propTypes = {
     match: PropTypes.shape({
       params: PropTypes.shape({
         repository: PropTypes.string,
@@ -14,7 +17,7 @@ export default class Repository extends Component {
 
   state = {
     repository: {},
-    issues: [],
+    issue: [],
     loading: true,
   };
 
@@ -42,6 +45,34 @@ export default class Repository extends Component {
 
   render() {
     const { repository, issues, loading } = this.state;
-    return <h1>Repository:</h1>;
+
+    if (loading) {
+      return <Loading>Carrengando</Loading>;
+    }
+    return (
+      <Container>
+        <Owner>
+          <Link to="/">Voltar para repositórios</Link>
+          <img src={repository.owner.avatar_url} alt={repository.owner.login} />
+          <h1>{repository.name}</h1>
+          <p>{repository.description}</p>
+        </Owner>
+
+        <IssueList>
+          {issues.map(issue => (
+            <li key={String(issue.id)}>
+              <img src={issue.user.avatar_url} alt={issue.user.login} />
+              <div>
+                <strong>
+                  <a href={issue.html_url}>{issue.title}</a>
+                  {/** LABELS */}
+                </strong>
+                <p>{issue.user.login}</p>
+              </div>
+            </li>
+          ))}
+        </IssueList>
+      </Container>
+    );
   }
 }
